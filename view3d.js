@@ -77,9 +77,9 @@ export function createView3d(canvas, store, ui) {
   const spinPlane = new THREE.Plane();
   const spinHit = new THREE.Vector3();
 
-  function resize() {
+function resize() {
     const rect = canvas.getBoundingClientRect();
-    const dpr = window.devicePixelRatio || 1;
+    const dpr = Math.min(window.devicePixelRatio || 1, 1.5);
     renderer.setPixelRatio(dpr);
     renderer.setSize(Math.max(1, rect.width), Math.max(1, rect.height), false);
     camera.aspect = rect.width / Math.max(1, rect.height);
@@ -1233,9 +1233,11 @@ export function createView3d(canvas, store, ui) {
       doorAmount = doorAmount < doorTarget ? Math.min(doorTarget, doorAmount + step) : Math.max(doorTarget, doorAmount - step);
       poseDoors();
     }
-    frame.last = now;
-    paint();
-    syncWalkMap();
+frame.last = now;
+    if (!canvas.hidden) {
+      paint();
+      syncWalkMap();
+    }
     requestAnimationFrame(frame);
   }
 
@@ -1614,6 +1616,15 @@ export function createView3d(canvas, store, ui) {
     turnModifier = false;
   });
   window.addEventListener("resize", resize);
+  canvas.addEventListener("webglcontextlost", (event) => {
+    event.preventDefault();
+  });
+  canvas.addEventListener("webglcontextrestored", () => {
+    composer = null;
+    composerSize = "";
+    resize();
+    rebuild();
+  });
   let envShown = false;
   let hidePlaced = ui.tab === "layout" && ui.showPlaced === false;
   store.subscribe(rebuild);
