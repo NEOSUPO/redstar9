@@ -34,6 +34,9 @@ export function createView3d(canvas, store, ui) {
   const controls = new OrbitControls(camera, canvas);
   controls.target.set(4000, 0, 3000);
   controls.maxPolarAngle = Math.PI * 0.49;
+  controls.minDistance = 400;
+  controls.maxDistance = 80000;
+  controls.zoomSpeed = 0.8;
   const sun = new THREE.DirectionalLight(0xffffff, 1.1);
   sun.position.set(4000, 8000, 2000);
   scene.add(sun);
